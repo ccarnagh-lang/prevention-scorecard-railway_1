@@ -256,6 +256,30 @@ app.post('/api/admin/programs', requireAdmin, async (req, res) => {
 });
 
 // ── SPA FALLBACK ──────────────────────────────────────────────
+app.get('/api/first-setup', async (req, res) => {
+  try {
+    const bcrypt = require('bcryptjs');
+    const existing = await pool.query('SELECT COUNT(*) as c FROM users');
+    if (parseInt(existing.rows[0].c) > 0) {
+      return res.json({ message: 'Setup already done — users exist. Delete this route.' });
+    }
+    const email    = process.env.ADMIN_EMAIL    || 'admin@agency.org';
+    const password = process.env.ADMIN_PASSWORD || 'Admin2025';
+    const name     = process.env.ADMIN_NAME     || 'System Administrator';
+    const hash     = bcrypt.hashSync(password, 10);
+    await pool.query(
+      `INSERT INTO users (email, password, name, initials, role, active)
+       VALUES ($1, $2, $3, 'SA', 'admin', true)`,
+      [email, hash, name]
+    );
+    res.json({
+      success: true,
+      message: `Admin account created! Login with: ${email} / ${password}`
+    });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
