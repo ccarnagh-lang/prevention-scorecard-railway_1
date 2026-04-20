@@ -1,6 +1,6 @@
 const express  = require('express');
 const session  = require('express-session');
-const PgStore  = require('connect-pg-simple')(session);
+// const PgStore = require('connect-pg-simple')(session);
 const bcrypt   = require('bcryptjs');
 const path     = require('path');
 const { migrate, pool } = require('./migrate');
@@ -13,13 +13,14 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(session({
-  store: process.env.DATABASE_URL
-    ? new PgStore({ pool, tableName: 'sessions' })
-    : undefined,
   secret:            process.env.SESSION_SECRET || 'dev-secret-change-in-production',
   resave:            false,
   saveUninitialized: false,
-  cookie: { maxAge: 8 * 60 * 60 * 1000 },
+  cookie: {
+    maxAge:   8 * 60 * 60 * 1000,
+    sameSite: 'lax',
+    secure:   false,
+  },
 }));
 
 // ── AUTH MIDDLEWARE ───────────────────────────────────────────
