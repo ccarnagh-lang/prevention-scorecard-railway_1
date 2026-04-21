@@ -100,4 +100,4 @@ app.get('/api/children/:caseId', requireAuth, async (req, res) => {
   catch(e) { res.status(500).json({ error: e.message }); }
 });
 app.get('/api/children', requireAuth, scopeProgram, async (req, res) => {
-  try { res.json(await db.getAllActiveChildren(req.programScope)); }
+try { res.json(await db.getAllActiveChildren(req.programScope)); } catch(e) { res.status(500).json({ error: e.message }); }
