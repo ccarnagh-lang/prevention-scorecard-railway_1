@@ -1,6 +1,6 @@
 {
   "name": "prevention-scorecard",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
